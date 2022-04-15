@@ -1,7 +1,7 @@
 #import "RNSound.h"
 
 #if __has_include("RCTUtils.h")
-#import "RCTUtils.h"
+#import <React/RCTUtils.h>
 #else
 #import <React/RCTUtils.h>
 #endif
@@ -219,6 +219,12 @@ RCT_EXPORT_METHOD(prepare
             player.delegate = self;
             player.enableRate = YES;
             [player prepareToPlay];
+
+          if (options && options[@"speed"]) {
+            NSNumber *speed = options[@"speed"];
+            player.rate = [speed floatValue];
+          }
+
             [[self playerPool] setObject:player forKey:key];
             callback([NSArray
                 arrayWithObjects:[NSNull null],

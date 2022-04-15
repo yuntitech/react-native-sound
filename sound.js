@@ -4,7 +4,7 @@ var ReactNative = require('react-native');
 var RNSound = ReactNative.NativeModules.RNSound;
 var IsAndroid = RNSound.IsAndroid;
 var IsWindows = RNSound.IsWindows;
-var resolveAssetSource = require("react-native/Libraries/Image/resolveAssetSource");
+var resolveAssetSource = require('react-native/Libraries/Image/resolveAssetSource');
 var eventEmitter = new ReactNative.NativeEventEmitter(RNSound);
 
 var nextKey = 0;
@@ -15,7 +15,7 @@ function isRelativePath(path) {
 
 function calculateRelativeVolume(volume, pan) {
   // calculates a lower volume relative to the pan value
-  const relativeVolume = (volume * (1 - Math.abs(pan)));
+  const relativeVolume = volume * (1 - Math.abs(pan));
   return Number(relativeVolume.toFixed(1));
 }
 
@@ -49,7 +49,7 @@ function Sound(filename, basePath, onError, options) {
     }
   }
 
-  this.registerOnPlay = function() {
+  this.registerOnPlay = function () {
     if (this.onPlaySubscription != null) {
       console.warn('On Play change event listener is already registered');
       return;
@@ -63,15 +63,14 @@ function Sound(filename, basePath, onError, options) {
           if (playerKey === this._key) {
             if (isPlaying) {
               this._playing = true;
-            }
-            else {
+            } else {
               this._playing = false;
             }
           }
-        },
+        }
       );
     }
-  }
+  };
 
   this._loaded = false;
   this._key = nextKey++;
@@ -100,11 +99,11 @@ function Sound(filename, basePath, onError, options) {
   });
 }
 
-Sound.prototype.isLoaded = function() {
+Sound.prototype.isLoaded = function () {
   return this._loaded;
 };
 
-Sound.prototype.play = function(onEnd) {
+Sound.prototype.play = function (onEnd) {
   if (this._loaded) {
     RNSound.play(this._key, (successfully) => onEnd && onEnd(successfully));
   } else {
@@ -113,7 +112,7 @@ Sound.prototype.play = function(onEnd) {
   return this;
 };
 
-Sound.prototype.pause = function(callback) {
+Sound.prototype.pause = function (callback) {
   if (this._loaded) {
     RNSound.pause(this._key, () => {
       this._playing = false;
@@ -123,7 +122,7 @@ Sound.prototype.pause = function(callback) {
   return this;
 };
 
-Sound.prototype.stop = function(callback) {
+Sound.prototype.stop = function (callback) {
   if (this._loaded) {
     RNSound.stop(this._key, () => {
       this._playing = false;
@@ -133,7 +132,7 @@ Sound.prototype.stop = function(callback) {
   return this;
 };
 
-Sound.prototype.reset = function() {
+Sound.prototype.reset = function () {
   if (this._loaded && IsAndroid) {
     RNSound.reset(this._key);
     this._playing = false;
@@ -141,7 +140,7 @@ Sound.prototype.reset = function() {
   return this;
 };
 
-Sound.prototype.release = function() {
+Sound.prototype.release = function () {
   if (this._loaded) {
     RNSound.release(this._key);
     this._loaded = false;
@@ -155,35 +154,35 @@ Sound.prototype.release = function() {
   return this;
 };
 
-Sound.prototype.getFilename = function() {
+Sound.prototype.getFilename = function () {
   return this._filename;
 };
 
-Sound.prototype.getDuration = function() {
+Sound.prototype.getDuration = function () {
   return this._duration;
 };
 
-Sound.prototype.getNumberOfChannels = function() {
+Sound.prototype.getNumberOfChannels = function () {
   return this._numberOfChannels;
 };
 
-Sound.prototype.getVolume = function() {
+Sound.prototype.getVolume = function () {
   return this._volume;
 };
 
-Sound.prototype.getSpeed = function() {
+Sound.prototype.getSpeed = function () {
   return this._speed;
 };
 
-Sound.prototype.getPitch = function() {
+Sound.prototype.getPitch = function () {
   return this._pitch;
 };
 
-Sound.prototype.setVolume = function(value) {
+Sound.prototype.setVolume = function (value) {
   this._volume = value;
   if (this._loaded) {
     if (IsAndroid) {
-      setAndroidVolumes(this)
+      setAndroidVolumes(this);
     } else {
       RNSound.setVolume(this._key, value);
     }
@@ -191,13 +190,13 @@ Sound.prototype.setVolume = function(value) {
   return this;
 };
 
-Sound.prototype.setPan = function(value) {
+Sound.prototype.setPan = function (value) {
   this._pan = value;
   if (this._loaded) {
     if (IsWindows) {
       throw new Error('#setPan not supported on windows');
     } else if (IsAndroid) {
-      setAndroidVolumes(this)
+      setAndroidVolumes(this);
     } else {
       RNSound.setPan(this._key, value);
     }
@@ -205,29 +204,29 @@ Sound.prototype.setPan = function(value) {
   return this;
 };
 
-Sound.prototype.getSystemVolume = function(callback) {
-  if(!IsWindows) {
+Sound.prototype.getSystemVolume = function (callback) {
+  if (!IsWindows) {
     RNSound.getSystemVolume(callback);
   }
   return this;
 };
 
-Sound.prototype.setSystemVolume = function(value) {
+Sound.prototype.setSystemVolume = function (value) {
   if (IsAndroid) {
     RNSound.setSystemVolume(value);
   }
   return this;
 };
 
-Sound.prototype.getPan = function() {
+Sound.prototype.getPan = function () {
   return this._pan;
 };
 
-Sound.prototype.getNumberOfLoops = function() {
+Sound.prototype.getNumberOfLoops = function () {
   return this._numberOfLoops;
 };
 
-Sound.prototype.setNumberOfLoops = function(value) {
+Sound.prototype.setNumberOfLoops = function (value) {
   this._numberOfLoops = value;
   if (this._loaded) {
     if (IsAndroid || IsWindows) {
@@ -239,17 +238,21 @@ Sound.prototype.setNumberOfLoops = function(value) {
   return this;
 };
 
-Sound.prototype.setSpeed = function(value) {
+Sound.prototype.setSpeed = function (value, onPause) {
   this._speed = value;
   if (this._loaded) {
     if (!IsWindows) {
-      RNSound.setSpeed(this._key, value);
+      if (IsAndroid) {
+        RNSound.setSpeed(this._key, value, onPause ? onPause : false);
+      } else {
+        RNSound.setSpeed(this._key, value);
+      }
     }
   }
   return this;
 };
 
-Sound.prototype.setPitch = function(value) {
+Sound.prototype.setPitch = function (value) {
   this._pitch = value;
   if (this._loaded) {
     if (IsAndroid) {
@@ -259,13 +262,13 @@ Sound.prototype.setPitch = function(value) {
   return this;
 };
 
-Sound.prototype.getCurrentTime = function(callback) {
+Sound.prototype.getCurrentTime = function (callback) {
   if (this._loaded) {
     RNSound.getCurrentTime(this._key, callback);
   }
 };
 
-Sound.prototype.setCurrentTime = function(value) {
+Sound.prototype.setCurrentTime = function (value) {
   if (this._loaded) {
     RNSound.setCurrentTime(this._key, value);
   }
@@ -273,7 +276,7 @@ Sound.prototype.setCurrentTime = function(value) {
 };
 
 // android only
-Sound.prototype.setSpeakerphoneOn = function(value) {
+Sound.prototype.setSpeakerphoneOn = function (value) {
   if (IsAndroid) {
     RNSound.setSpeakerphoneOn(this._key, value);
   }
@@ -283,47 +286,47 @@ Sound.prototype.setSpeakerphoneOn = function(value) {
 
 // This is deprecated.  Call the static one instead.
 
-Sound.prototype.setCategory = function(value) {
+Sound.prototype.setCategory = function (value) {
   Sound.setCategory(value, false);
-}
+};
 
-Sound.prototype.isPlaying = function() {
+Sound.prototype.isPlaying = function () {
   return this._playing;
-}
+};
 
-Sound.enable = function(enabled) {
+Sound.enable = function (enabled) {
   RNSound.enable(enabled);
 };
 
-Sound.enableInSilenceMode = function(enabled) {
+Sound.enableInSilenceMode = function (enabled) {
   if (!IsAndroid && !IsWindows) {
     RNSound.enableInSilenceMode(enabled);
   }
 };
 
-Sound.setActive = function(value) {
+Sound.setActive = function (value) {
   if (!IsAndroid && !IsWindows) {
     RNSound.setActive(value);
   }
 };
 
-Sound.setCategory = function(value, mixWithOthers = false) {
+Sound.setCategory = function (value, mixWithOthers = false) {
   if (!IsWindows) {
     RNSound.setCategory(value, mixWithOthers);
   }
 };
 
-Sound.setMode = function(value) {
+Sound.setMode = function (value) {
   if (!IsAndroid && !IsWindows) {
     RNSound.setMode(value);
   }
 };
 
-Sound.setSpeakerPhone = function(value) {
+Sound.setSpeakerPhone = function (value) {
   if (!IsAndroid && !IsWindows) {
-    RNSound.setSpeakerPhone(value)
+    RNSound.setSpeakerPhone(value);
   }
-}
+};
 
 Sound.MAIN_BUNDLE = RNSound.MainBundlePath;
 Sound.DOCUMENT = RNSound.NSDocumentDirectory;

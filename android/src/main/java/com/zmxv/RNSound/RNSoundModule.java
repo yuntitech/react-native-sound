@@ -387,7 +387,7 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
   }
 
   @ReactMethod
-  public void setSpeed(final Double key, final Float speed) {
+  public void setSpeed(final Double key, final Float speed, final boolean onPause) {
 	if (android.os.Build.VERSION.SDK_INT < 23) {
 	  Log.w("RNSoundModule", "setSpeed ignored due to sdk limit");
 	  return;
@@ -396,6 +396,9 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     MediaPlayer player = this.playerPool.get(key);
     if (player != null) {
       player.setPlaybackParams(player.getPlaybackParams().setSpeed(speed));
+      if (onPause) {
+        player.pause();
+      }
     }
   }
 
