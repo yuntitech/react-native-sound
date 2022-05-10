@@ -1,6 +1,6 @@
 #import "RNSound.h"
 
-#if __has_include("RCTUtils.h")
+#if __has_include(<React/RCTUtils.h>)
 #import <React/RCTUtils.h>
 #else
 #import <React/RCTUtils.h>
@@ -19,12 +19,16 @@
         [userInfo[@"AVAudioSessionRouteChangeReasonKey"] longValue];
     AVAudioSessionInterruptionType audioSessionInterruptionType =
         [userInfo[@"AVAudioSessionInterruptionTypeKey"] longValue];
+    AVAudioSessionInterruptionOptions audioSessionInterruptOptions = [userInfo[@"AVAudioSessionInterruptionOptions"] longValue];
     AVAudioPlayer *player = [self playerForKey:self._key];
     if (audioSessionInterruptionType == AVAudioSessionInterruptionTypeEnded) {
+      // https://developer.apple.com/documentation/avfaudio/avaudiosessioninterruptionnotification/
+      if (audioSessionInterruptOptions == AVAudioSessionInterruptionOptionShouldResume) {
         if (player) {
             [player play];
             [self setOnPlay:YES forPlayerKey:self._key];
         }
+      }
     }
     else if (audioSessionRouteChangeReason ==
         AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
