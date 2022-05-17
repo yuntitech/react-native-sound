@@ -73,6 +73,9 @@ function Sound(filename, basePath, onError, options) {
   };
 
   this._loaded = false;
+  if (nextKey > 200) {
+    nextKey = 0;
+  }
   this._key = nextKey++;
   this._playing = false;
   this._duration = -1;
@@ -151,6 +154,7 @@ Sound.prototype.release = function () {
       }
     }
   }
+  nextKey = this._key--;
   return this;
 };
 
