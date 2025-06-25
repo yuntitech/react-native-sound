@@ -4,7 +4,7 @@ var ReactNative = require('react-native');
 var RNSound = ReactNative.NativeModules.RNSound;
 var IsAndroid = RNSound.IsAndroid;
 var IsWindows = RNSound.IsWindows;
-var resolveAssetSourceModule = require("react-native/Libraries/Image/resolveAssetSource");
+var resolveAssetSourceModule = require("react-native/Libraries/Image/resolveAssetSource").default;
 var resolveAssetSource = resolveAssetSourceModule && resolveAssetSourceModule.__esModule
   ? resolveAssetSourceModule.default
   : resolveAssetSourceModule;
